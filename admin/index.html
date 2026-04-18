@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RisenRunTT | Admin Upload</title>
+    <link rel="stylesheet" href="../assets/css/styles.css">
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container nav-wrap">
+        <a class="logo" href="../index.html">Risen<span>RunTT</span></a>
+        <nav class="nav-links" aria-label="Main">
+          <a href="../index.html">Browse Events</a>
+          <a href="../results.html">Results</a>
+          <a href="../contact.html">Contact</a>
+        </nav>
+        <a class="btn btn-outline" href="../index.html">Back to Site</a>
+      </div>
+    </header>
+
+    <main class="container section">
+      <div class="page-header">
+        <h1>Event Upload</h1>
+      </div>
+
+      <section class="panel reveal">
+        <form id="adminForm">
+          <div style="display: grid; gap: 14px;">
+            <div>
+              <label for="event_id" style="display: block; font-weight: 700; margin-bottom: 6px;">Event ID (unique, required)</label>
+              <input id="event_id" type="text" required placeholder="e.g., event_2026_001" style="width: 100%; min-height: 40px; border: 1px solid var(--line); border-radius: 10px; padding: 0 12px; font-family: inherit;">
+            </div>
+
+            <div>
+              <label for="title" style="display: block; font-weight: 700; margin-bottom: 6px;">Event Title (required)</label>
+              <input id="title" type="text" required placeholder="e.g., Support Autism T&T 5K Run" style="width: 100%; min-height: 40px; border: 1px solid var(--line); border-radius: 10px; padding: 0 12px; font-family: inherit;">
+            </div>
+
+            <div>
+              <label for="category" style="display: block; font-weight: 700; margin-bottom: 6px;">Category (required)</label>
+              <select id="category" required style="width: 100%; min-height: 40px; border: 1px solid var(--line); border-radius: 10px; padding: 0 12px; font-family: inherit;">
+                <option value="">Select a category</option>
+                <option value="Road Race">Road Race</option>
+                <option value="Virtual 5K">Virtual 5K</option>
+                <option value="Charity Run">Charity Run</option>
+                <option value="Fun Walk">Fun Walk</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+              <div>
+                <label for="date_iso" style="display: block; font-weight: 700; margin-bottom: 6px;">Date (YYYY-MM-DD, required)</label>
+                <input id="date_iso" type="date" required style="width: 100%; min-height: 40px; border: 1px solid var(--line); border-radius: 10px; padding: 0 12px; font-family: inherit;">
+              </div>
+              <div>
+                <label for="time_local" style="display: block; font-weight: 700; margin-bottom: 6px;">Time (HH:MM, required)</label>
+                <input id="time_local" type="time" required style="width: 100%; min-height: 40px; border: 1px solid var(--line); border-radius: 10px; padding: 0 12px; font-family: inherit;">
+              </div>
+            </div>
+
+            <div>
+              <label for="location" style="display: block; font-weight: 700; margin-bottom: 6px;">Location (required)</label>
+              <input id="location" type="text" required placeholder="e.g., Brian Lara Cricket Academy" style="width: 100%; min-height: 40px; border: 1px solid var(--line); border-radius: 10px; padding: 0 12px; font-family: inherit;">
+            </div>
+
+            <div>
+              <label for="price_ttd" style="display: block; font-weight: 700; margin-bottom: 6px;">Price (TTD, required)</label>
+              <input id="price_ttd" type="number" step="0.01" required placeholder="e.g., 150" style="width: 100%; min-height: 40px; border: 1px solid var(--line); border-radius: 10px; padding: 0 12px; font-family: inherit;">
+            </div>
+
+            <div>
+              <label for="imageFile" style="display: block; font-weight: 700; margin-bottom: 6px;">Event Image (JPG, PNG)</label>
+              <input id="imageFile" type="file" accept="image/*" style="display: block;">
+            </div>
+
+            <div>
+              <label for="register_url" style="display: block; font-weight: 700; margin-bottom: 6px;">Registration URL (required)</label>
+              <input id="register_url" type="url" required placeholder="https://forms.google.com/..." style="width: 100%; min-height: 40px; border: 1px solid var(--line); border-radius: 10px; padding: 0 12px; font-family: inherit;">
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="margin-top: 8px;">Upload Event</button>
+            <div id="status" style="min-height: 20px; font-weight: 700; color: var(--muted);"></div>
+          </div>
+        </form>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-wrap">
+        <div>RisenRunTT</div>
+        <div>Trinidad & Tobago</div>
+      </div>
+    </footer>
+
+    <script type="module">
+      // This is the bridge to your Google Sheet
+      const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzYvFjpjYzggXwvfmMQhksUoYCwCbpC62pQ-UZlyHVbeqvHm-Z7rC5zi5mFoTsriLKdqQ/exec';
+
+      document.getElementById('adminForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const status = document.getElementById('status');
+        const btn = e.target.querySelector('button');
+        
+        status.textContent = "🚀 Uploading to RisenRun database...";
+        btn.disabled = true;
+
+        const fileInput = document.getElementById('imageFile');
+        let imageUrl = "";
+
+        // Convert image to Base64 text so it can be stored in the Sheet
+        if (fileInput.files[0]) {
+          const reader = new FileReader();
+          const base64Promise = new Promise(resolve => {
+            reader.onload = () => resolve(reader.result);
+            reader.readAsDataURL(fileInput.files[0]);
+          });
+          imageUrl = await base64Promise;
+        }
+
+        const payload = {
+          title: document.getElementById('title').value,
+          event_id: document.getElementById('event_id').value,
+          date_iso: document.getElementById('date_iso').value,
+          time_local: document.getElementById('time_local').value,
+          location: document.getElementById('location').value,
+          category: document.getElementById('category').value,
+          price_ttd: document.getElementById('price_ttd').value,
+          image_url: imageUrl,
+          register_url: document.getElementById('register_url').value,
+          status: 'published' // Auto-publish for now
+        };
+
+        try {
+          await fetch(APPS_SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors', 
+            cache: 'no-cache',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              tabName: 'Events',
+              payload: payload
+            })
+          });
+          
+          status.innerHTML = "<b style='color:var(--ok)'>✅ Event added successfully!</b>";
+          e.target.reset();
+        } catch (err) {
+          status.textContent = "❌ Error: " + err.message;
+        } finally {
+          btn.disabled = false;
+        }
+      });
+    </script>
+  </body>
+</html>

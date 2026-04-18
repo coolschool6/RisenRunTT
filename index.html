@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RisenRunTT | Events</title>
+    <link rel="stylesheet" href="assets/css/styles.css">
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container nav-wrap">
+        <a class="logo" href="index.html">Risen<span>RunTT</span></a>
+        <nav class="nav-links" aria-label="Main">
+          <a data-nav href="index.html">Browse Events</a>
+          <a data-nav href="results.html">Results</a>
+          <a data-nav href="contact.html">Contact</a>
+        </nav>
+        <a class="btn btn-primary" href="admin/index.html">Admin Upload</a>
+      </div>
+    </header>
+
+    <section class="hero">
+      <div class="container hero-grid">
+        <h1 class="reveal">RisenRunTT Events Hub</h1>
+        <p class="reveal delay-1">Live event board powered by your Google Sheet. Publish races once, display everywhere.</p>
+      </div>
+    </section>
+
+    <main class="container section" aria-live="polite">
+      <div class="toolbar reveal delay-1">
+        <div class="toolbar-left">
+          <input data-filter-search type="search" placeholder="Search by event, location, category">
+        </div>
+        <div class="toolbar-right">
+          <select data-filter-year aria-label="Year filter">
+            <option value="">All Years</option>
+          </select>
+          <select data-filter-category aria-label="Category filter">
+            <option value="">All Categories</option>
+          </select>
+        </div>
+      </div>
+
+      <h2 class="section-title reveal delay-2">Upcoming Events (<span data-total-count>0</span>)</h2>
+      <div class="grid-cards" data-events-list>
+        <div class="state-box">Waiting for live events. Add your sheet ID in assets/js/config.js.</div>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-wrap">
+        <div>RisenRunTT</div>
+        <div>Trinidad & Tobago</div>
+      </div>
+    </footer>
+
+    <script type="module" src="assets/js/shared.js"></script>
+    <script type="module" src="assets/js/events-page.js"></script>
+  </body>
+</html>
